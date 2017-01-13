@@ -4,7 +4,7 @@
 	  "parameters": {
 		"artifactsBaseUrl": {
 		  "type": "string",
-		  "defaultValue": "https://raw.githubusercontent.com/radhikakarthik/DMAzureCluster/master",
+		  "defaultValue": "https://raw.githubusercontent.com/radhikakarthik/DM_Cluster_MarketPlace/master",
 		  "metadata": {
 			"description": "Base URL of the solution template gallery package not including the trailing slash",
 			"artifactsBaseUrl": ""
