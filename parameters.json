@@ -1,0 +1,66 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+   "location": {
+    "value": "westus"
+  },
+  "adminUsername": {
+    "value": "azureuser"
+  },
+  "authenticationType": {
+    "value": "password"
+  },
+  "adminPassword": {
+    "value": "dataMOVER487"
+  },
+  "dmPassword": {
+    "value": "dataMOVER487"
+  },
+  "vnetResourceGroup": {
+    "value": "testdatamover"
+  },
+  "vnetName": {
+    "value": "vnet-dm"
+  },
+  "vnetNewOrExisting": {
+    "value": "new"
+  },
+  "vnetAddressSpace": {
+    "value": "10.7.0.0/16"
+  },
+  "vmSubnetName": {
+    "value": "vmsubnet"
+  },
+  "vmSubnetAddressSpace": {
+    "value": "10.7.0.0/24"
+  },
+  "vmSubnetStartAddress": {
+    "value": "10.7.0.4"
+  },
+  "sourceAddressSpace": {
+    "value": "141.206.246.10/32"
+  },
+  "dmDBCPassword": {
+    "value": "dataMOVER487"
+  },
+  "dmIntPassword": {
+    "value": "dataMOVER487"
+  },
+  "dmSystemPrefix": {
+    "value": "datamover"
+  },
+  "dmAgentNodeCount": {
+    "value": 3
+  },
+  "dmClusterVmSize": {
+    "value": "Standard_DS5_v2"
+  },
+  "tdcTimeZone": {
+    "value": "UTC"
+  },
+  "ntpServerlist": {
+    "value": "0.pool.ntp.org,1.pool.ntp.org,2.pool.ntp.org,3.pool.ntp.org"
+  }    
+ }
+}

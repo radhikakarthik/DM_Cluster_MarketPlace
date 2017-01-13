@@ -1,0 +1,794 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": { 
+	"apiVersions": {
+      "type": "object",
+      "metadata": {
+        "description": "Object with all relevant API versions passed from the mainTemplate"
+      }
+    },  
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location for the deployment"
+      }
+    },
+    "adminUserName": {
+      "type": "string",      
+      "metadata": {
+        "description": "Username for administrator"
+      }
+    },   
+    "dmPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for administrator"
+      }
+    },	
+    "dmSshPublicKey": {
+      "type": "string",      
+      "metadata": {
+        "description": "SSH public key that will be included on all nodes in the cluster. The OpenSSH public key can be generated with tools like ssh-keygen on Linux or OS X."
+      }
+    },
+	"dmAuthenticationType": {
+      "type": "string",         
+      "metadata": {
+        "description": "Authentication type for the virtual machines"
+      }
+    },
+	"dmDBCPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for DBS"
+      }
+    },	   
+	"dmIntPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for DBS"
+      }
+    },
+	"dmSystemPrefix": {
+      "type": "string",    
+      "metadata": {
+        "description": "Datamover VM system prefix"
+      }
+    },	
+	"dmSystemCount":{
+	  "type":"int",
+	  "metadata":{
+	     "description":"Datamover Master node count"
+	  }	
+	},
+    "dmAgentCount": {
+      "type": "int",
+      "metadata": {
+        "description": "The number of agent virtual machines instances to provision"
+      }
+    },	
+	"dmMasterCount":{
+	  "type":"int",
+	  "metadata":{
+		"description":"Number of master node for Datamover"
+	  }	
+	},
+    "dmVMSize": {
+      "type": "string",    
+      "metadata": {
+        "description": "Datamover VM size"
+      }
+    },	
+    "subnet1DMID":{
+	  "type":"string",
+	  "metadata":{
+		"description":"Datamover Subnet ID"	  
+	  }
+	},	
+	"dmSubnetStartAddress":{
+	 "type":"string",
+	 "metadata":{
+	   "description":"Datmover subnet start address"
+	 }
+	},
+  "vmSubnetAddressSpace": {
+      "type": "string",
+      "metadata": {
+        "description": "Address space of the VM subnet"
+      }
+    },
+    "sourceAddressSpace": {
+      "type": "string",
+      "metadata": {
+        "description": "CIDR block defining acceptable address range for remote SSH access"
+      }
+    },
+	"imageStorageAccountType": {
+      "type": "string",     
+      "metadata": {
+        "description": "Storage Account type for OS vhd"
+      }      
+    },	
+	"sharedStorageAccountType":{
+	  "type":"string",
+	  "metadata":{
+	    "description":"StorageAccount type for data disk vhd"
+	  }
+	},	
+	"imagePublisher":{
+	 "type":"string",
+	 "metadata":{
+	   "description":"Image publisher"
+	 }	
+	},
+	"imageOffer":{
+	 "type":"string",
+	 "metadata":{
+	   "description":"Image offer name" 
+	  }	
+	},
+	"imageSku":{
+	  "type":"string",
+	  "metadata":{
+		"description":"Image Sku name"
+	   }
+	},	
+	"imageOfferAgent":{
+	 "type":"string",
+	 "metadata":{
+	   "description":"Image offer name" 
+	  }	
+	},
+	"imageSkuAgent":{
+	  "type":"string",
+	  "metadata":{
+		"description":"Image Sku name"
+	   }
+	},
+	"tdcTimeZone": {           
+       "type": "string",			
+       "metadata": {
+             "description": "Time zone for TDC Network"
+       }
+    },
+	"ntpServerlist": {           
+        "type": "string",			
+        "metadata": {
+          "description": "NTPservers for all applications"
+        }
+    },
+       "generateHostFileParam":{
+	 "type":"string",
+	 "metadata":{
+	   "description":"Parmeter for script host file"
+	 }	
+	},
+
+	"ansibleparam":{
+	 "type":"string",
+	 "metadata":{
+	   "description":"Parmeter for ansible script file"
+	 }	
+	},
+
+	"scriptUrlInit":{
+		"type":"string",
+		"metadata":{
+				"description":"File script url for generating hosts and all file"
+		}	
+	},
+	"teradataTags":{
+	 "type":"object",
+	 "metadata":{
+	    "description":"Tags for teradata resources"
+	 }	
+	}	
+  },
+  "variables": {      	
+    "nic1": "[concat(parameters('dmSystemPrefix'),'-','nic1')]",   
+    "vm": "[concat(parameters('dmSystemPrefix'),'-','DM')]", 
+    "clusterAvailabilitySetSettings": {
+      "name": "[concat(parameters('dmSystemPrefix'),'-as')]",
+      "faultDomainCount": "3",
+      "updateDomainCount": "20"
+    },
+    "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+    "linuxConfiguration_sshPublicKey": {
+      "disablePasswordAuthentication": "true",
+      "ssh": {
+        "publicKeys": [
+          {
+            "path": "[variables('sshKeyPath')]",
+            "keyData": "[parameters('dmSshPublicKey')]"
+          }
+        ]
+      }
+    },
+	"vhdsContainer":"vhds",
+    "linuxConfiguration_password": { },
+    "linuxConfiguration": "[variables(concat('linuxConfiguration_',parameters('dmAuthenticationType')))]",	
+	"dataStoreStorageAccountArray": [
+      "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'0'),'0')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'1'),'1')]",
+      "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'2'),'2')]",      
+      "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'3'),'3')]",
+      "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'4'),'4')]",
+      "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'5'),'5')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'6'),'6')]", 
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'7'),'7')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'8'),'8')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'9'),'9')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'10'),'10')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'11'),'11')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'12'),'12')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'13'),'13')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'14'),'14')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'15'),'15')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'16'),'16')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'17'),'17')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'18'),'18')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'19'),'19')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'20'),'20')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'21'),'21')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'22'),'22')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'23'),'23')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'24'),'24')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'25'),'25')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'26'),'26')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'27'),'27')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'28'),'28')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'29'),'29')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'30'),'30')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'31'),'31')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'32'),'32')]",
+	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'33'),'33')]"
+    ],   
+	"diskCaching":"None",
+	"datadiskSize":256,	
+	"publicIPAddressName":"[concat(parameters('dmSystemPrefix'),'-','publicip')]",
+	"publicIPAddressDomainNameLabel":"[concat(parameters('dmSystemPrefix'),'-',uniqueString(resourceGroup().id))]",
+	"dataStoreStorageAccountCount": "[add(div(parameters('dmSystemCount'),4),1)]",
+    "diagnosticsStorageAccount": "[concat('dmdiag',uniqueString(resourceGroup().id,'d'))]",	
+	"s1": "[split(parameters('dmSubnetStartAddress'),'.')]",
+	"scriptHostUrltz":"[concat(parameters('scriptUrlInit'),'tdc-timezone.py')]",
+	"scriptHostUrleco":"[concat(parameters('scriptUrlInit'),'eco_ansi.sh')]",
+	"publicIPAddressType":"Static",
+  "nsgName": "dm-nsg"    	
+  },
+  "resources": [ 
+     {
+      "apiVersion": "[parameters('apiversions').compute.availabilitySets]",
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('clusterAvailabilitySetSettings').name]",
+      "location": "[parameters('location')]",
+	  "tags": {
+          "provider": "[toUpper(parameters('teradataTags').provider)]"
+      },
+      "properties": {
+        "platformFaultDomainCount": "[variables('clusterAvailabilitySetSettings').faultDomainCount]",
+        "platformUpdateDomainCount": "[variables('clusterAvailabilitySetSettings').updateDomainCount]"
+      }
+    },
+	{
+      "apiVersion": "[parameters('apiVersions').network.publicIPAddresses]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[concat(variables('publicIPAddressName'),copyIndex())]",
+      "location": "[parameters('location')]",	  
+	  "tags": {
+        "provider": "[toUpper(parameters('teradataTags').provider)]"
+      },	
+	  "copy": {
+        "name": "publicIPCopy",
+        "count": "[parameters('dmSystemCount')]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",		
+        "dnsSettings": {
+          "domainNameLabel": "[concat(variables('publicIPAddressDomainNameLabel'), copyIndex())]"
+        },
+		"idleTimeoutInMinutes": 30
+      }
+    },	
+	{
+		  "apiVersion": "[parameters('apiVersions').storage.storageAccounts]",
+		  "type": "Microsoft.Storage/storageAccounts",
+		  "name": "[variables('diagnosticsStorageAccount')]",
+		  "location": "[parameters('location')]",	  
+		  "tags": {
+			"provider": "[toUpper(parameters('teradataTags').provider)]"
+		  },	  
+		  "kind": "Storage",
+		  "sku": {
+			"name": "Standard_LRS"
+		  },
+		  "properties": {
+		  }
+	},    
+    {
+		  "apiVersion": "[parameters('apiVersions').storage.storageAccounts]",
+		  "type": "Microsoft.Storage/storageAccounts",
+		  "name": "[concat('os',variables('dataStoreStorageAccountArray')[copyIndex()])]",
+		  "location": "[parameters('location')]",
+		  "kind": "Storage",	  
+		  "tags": {
+			"provider": "[toUpper(parameters('teradataTags').provider)]"
+		  },
+		  "copy": {
+            "name": "osStorageAccountsCopy",
+            "count": "[variables('dataStoreStorageAccountCount')]"
+          },
+		  "sku": {
+			"name": "[parameters('imageStorageAccountType')]"
+		  },
+		  "properties": {
+		  }
+	},		
+	{
+      "apiVersion": "[parameters('apiVersions').storage.storageAccounts]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('dataStoreStorageAccountArray')[copyIndex()]]",
+      "location": "[parameters('location')]",
+      "kind": "Storage",	  
+	  "tags": {
+     	"provider": "[toUpper(parameters('teradataTags').provider)]"
+      },
+	  "copy": {
+        "name": "dataStoreStorageAccountsCopy",
+        "count": "[variables('dataStoreStorageAccountCount')]"
+      },
+      "sku": {
+        "name": "[parameters('sharedStorageAccountType')]"
+      },
+      "properties": {
+      }
+    },	
+     {
+      "apiVersion": "[parameters('apiVersions').network.networkSecurityGroups]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('nsgname')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "provider": "[toUpper(parameters('teradataTags').provider)]"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow_Remote_SSH",
+            "properties": {
+              "description": "Allow Remote SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('sourceAddressSpace')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "Allow_Local_SSH",
+            "properties": {
+              "description": "Allow Local SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 101,
+              "direction": "Inbound"
+            }
+          },
+         {
+				    "name": "Allow_TDDBS",
+			      "properties": {
+				    "description": "Allow Teradata Database Service",
+				    "protocol": "Tcp",
+				    "sourcePortRange": "*",
+				    "destinationPortRange": "1025",
+				    "sourceAddressPrefix": "*",
+				    "destinationAddressPrefix": "*",
+				    "access": "Allow",
+				    "priority": 101,
+				    "direction": "Inbound"
+				}
+			  },
+          {
+            "name": "Allow_REST_HTTP",
+            "properties": {
+              "description": "Allow Teradata REST ful Service",
+              "protocol": "TCP",
+              "sourcePortRange": "*",
+              "destinationPortRange": "1080",
+              "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 102,
+              "direction": "Inbound"
+            }
+          },
+          {
+				"name": "Allow_mastersync",
+				"properties": {
+				  "description": "Allow Teradata mastersync Service",
+				  "protocol": "*",
+				  "sourcePortRange": "*",
+				  "destinationPortRange": "25368",
+				  "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
+				  "destinationAddressPrefix": "*",
+				  "access": "Allow",
+				  "priority": 107,
+				  "direction": "Inbound"
+				}
+			  },
+			  {
+				"name": "Allow_ActiveMq",
+				"properties": {
+				  "description": "Allow Teradata ActiveMq Service",
+				  "protocol": "*",
+				  "sourcePortRange": "*",
+				  "destinationPortRange": "61616",
+				  "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
+				  "destinationAddressPrefix": "*",
+				  "access": "Allow",
+				  "priority": 108,
+				  "direction": "Inbound"
+				}
+			  },
+          {
+				"name": "Allow_arc2",
+				"properties": {
+				  "description": "Allow Teradata ARC Service",
+				  "protocol": "*",
+				  "sourcePortRange": "*",
+				  "destinationPortRange": "25268",
+				  "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
+				  "destinationAddressPrefix": "*",
+				  "access": "Allow",
+				  "priority": 106,
+				  "direction": "Inbound"
+				}
+			  },
+           {
+				"name": "Allow_ARC",
+				"properties": {
+				  "description": "Allow Teradata ARC Service",
+				  "protocol": "*",
+				  "sourcePortRange": "*",
+				  "destinationPortRange": "25168",
+				  "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
+				  "destinationAddressPrefix": "*",
+				  "access": "Allow",
+				  "priority": 105,
+				  "direction": "Inbound"
+				}
+			  },
+          {
+			    	"name": "Allow_SM2",
+			    	"properties": {
+			   	  "description": "Allow Teradata SM Service",
+				    "protocol": "*",
+				    "sourcePortRange": "*",
+				    "destinationPortRange": "5190",
+				    "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
+				    "destinationAddressPrefix": "*",
+				    "access": "Allow",
+				    "priority": 104,
+				    "direction": "Inbound"
+			  	}
+			  },
+            {
+			      "name": "Allow_SM",
+			      "properties": {
+				     "description": "Allow Teradata SM Service",
+				     "protocol": "*",
+				     "sourcePortRange": "*",
+				  "destinationPortRange": "5180",
+				  "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
+				  "destinationAddressPrefix": "*",
+				  "access": "Allow",
+				  "priority": 103,
+				  "direction": "Inbound"
+				}
+			  },
+          {
+            "name": "Allow_NTP",
+            "properties": {
+              "description": "Allow NTP Service",
+              "protocol": "UDP",
+              "sourcePortRange": "*",
+              "destinationPortRange": "123",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 115,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },    
+    {
+      "apiVersion": "[parameters('apiVersions').network.networkInterfaces]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('nic1'),copyIndex())]",
+      "location": "[parameters('location')]",
+	  "tags": {
+        "provider": "[toUpper(parameters('teradataTags').provider)]"
+      },
+      "dependsOn": [
+       "[concat('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'),copyIndex())]",
+       "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgname'))]"
+      ],
+	   "copy": {
+        "name": "nics1Copy",
+        "count": "[parameters('dmSystemCount')]"
+      },
+      "properties": {
+
+	    "networkSecurityGroup":
+       {
+         "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgname'))]"
+              }, 
+        "ipConfigurations": [
+          {
+            "name": "ip1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+			  "privateIPAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),copyIndex()),256)), '.', mod(add(int(variables('s1')[3]),copyIndex()),256))]",              
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('publicIPAddressName'),copyIndex()))]"
+              },
+              "subnet": {
+                "id": "[parameters('subnet1DMID')]"
+              }
+            }
+          }
+        ]
+      }
+    },	
+    {
+      "apiVersion": "[parameters('apiVersions').compute.virtualMachines]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(variables('vm'),concat('Master-Agent',add(1,copyIndex())))]",
+      "location": "[parameters('location')]",
+	  "plan":{
+		 "name":"[parameters('imageSku')]",		 
+		 "product":"[parameters('imageOffer')]",
+		 "publisher":"[parameters('imagePublisher')]"
+	  },
+      "dependsOn": [
+	    "[concat('Microsoft.Network/networkInterfaces/', variables('nic1'),copyIndex())]",
+        "[concat('Microsoft.Compute/availabilitySets/', variables('clusterAvailabilitySetSettings').name)]", 
+		"[concat('Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccount'))]",
+		"[concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))])]",		
+		"[concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))])]"		
+      ],
+      "copy": {
+        "name": "vmsCopy",
+        "count": "[parameters('dmMasterCount')]"
+      },
+      "tags": {
+       "provider": "[toUpper(parameters('teradataTags').provider)]"
+      },
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('clusterAvailabilitySetSettings').name)]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('dmVMSize')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(variables('vm'),concat('Master-Agent',add(1,copyIndex())))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('dmPassword')]",
+          "linuxConfiguration": "[variables('linuxConfiguration')]"
+        },
+        "storageProfile": {   
+		  "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSku')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",			
+            "vhd": {              
+			  "uri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,'vhds/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],parameters('dmSystemPrefix'),copyIndex(),'-osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+		 "dataDisks": [
+                        {
+                            "name": "[concat('datadisk1',copyIndex())]",                            
+                            "lun": 0,
+							"createOption": "FromImage",							
+                            "vhd": {							
+                                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk1',copyIndex()),'.vhd')]"
+                            }                            
+                        },
+                        {
+                            "name": "[concat('datadisk2',copyIndex())]",                            
+                            "lun": 1,
+                            "createOption": "FromImage",							
+							"vhd": {
+                                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk2',copyIndex()),'.vhd')]"
+                            }                            
+                        },
+						{
+                            "name": "[concat('datadisk3',copyIndex())]",                            
+                            "lun": 2,
+							"createOption": "FromImage",							
+                            "vhd": {							
+                                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk3',copyIndex()),'.vhd')]"
+                            }                            
+                        },
+                        {
+                            "name": "[concat('datadisk4',copyIndex())]",                            
+                            "lun": 3,
+                            "createOption": "FromImage",							
+							"vhd": {
+                                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk4',copyIndex()),'.vhd')]"
+                            }                            
+                        }
+            ]
+		},
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',variables('diagnosticsStorageAccount'),'.blob.core.windows.net')]"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nic1'),copyIndex()))]",
+              "properties": {
+                "primary": true
+              }
+            }
+          ]
+        }
+      }
+    },
+	{
+      "apiVersion": "[parameters('apiVersions').compute.virtualMachines]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(variables('vm'),concat('-Agent',add(1,copyIndex(1))))]",
+      "location": "[parameters('location')]",
+	  "plan":{
+		 "name":"[parameters('imageSkuAgent')]",		 
+		 "product":"[parameters('imageOfferAgent')]",
+		 "publisher":"[parameters('imagePublisher')]"
+	  },
+      "dependsOn": [
+	    "[concat('Microsoft.Network/networkInterfaces/', variables('nic1'),copyIndex(1))]",
+        "[concat('Microsoft.Compute/availabilitySets/', variables('clusterAvailabilitySetSettings').name)]", 
+		"[concat('Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccount'))]",
+		"[concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(1),variables('dataStoreStorageAccountCount'))])]",		
+		"[concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(1),variables('dataStoreStorageAccountCount'))])]"		
+      ],
+      "copy": {
+        "name": "vmsCopyAgent",
+        "count": "[parameters('dmAgentCount')]"
+      },
+      "tags": {
+       "provider": "[toUpper(parameters('teradataTags').provider)]"
+      },
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('clusterAvailabilitySetSettings').name)]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('dmVMSize')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(variables('vm'),concat('-Agent',add(1,copyIndex(1))))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('dmPassword')]",
+          "linuxConfiguration": "[variables('linuxConfiguration')]"
+        },
+        "storageProfile": {   
+		  "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOfferAgent')]",
+            "sku": "[parameters('imageSkuAgent')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",			
+            "vhd": {              
+			  "uri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(1),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,'vhds/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],parameters('dmSystemPrefix'),copyIndex(1),'-osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }		 
+		},
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',variables('diagnosticsStorageAccount'),'.blob.core.windows.net')]"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nic1'),copyIndex(1)))]",
+              "properties": {
+                "primary": true
+              }
+            }
+          ]
+        }
+      }
+    },
+         {
+      "apiVersion": "[parameters('apiVersions').compute.virtualMachineExtensions]",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(concat(variables('vm'),concat('-Agent',add(1,copyIndex(1)))), '/init')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "vmsCopyAgent"
+      ],
+      "copy": {
+        "name": "initAgentCopy",
+        "count": "[parameters('dmAgentCount')]"
+      },
+	  "tags": {
+        "provider": "[toUpper(parameters('teradataTags').provider)]"
+      },
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": "true",
+        "settings": {
+          "fileUris":[
+				"[variables('scriptHostUrltz')]"
+		  ]      
+        },
+    "protectedSettings":{
+                    "commandToExecute": "[concat('sudo python2.6 tdc-timezone.py ',parameters('tdcTimeZone'),' &&  sudo -i source /etc/profile ','  &&  sudo /usr/local/bin/tdc-ecosystem-ssh --enable ')]"
+		}
+      }
+    } ,
+      {
+      "apiVersion": "[parameters('apiVersions').compute.virtualMachineExtensions]",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(concat(variables('vm'),concat('Master-Agent',add(1,copyIndex()))), '/init')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "vmsCopy",
+        "initAgentCopy"
+      ],
+      "copy": {
+        "name": "initMasterCopy",
+        "count": "[parameters('dmMasterCount')]"
+      },
+	  "tags": {
+        "provider": "[toUpper(parameters('teradataTags').provider)]"
+      },
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": "true",
+        "settings": {
+          "fileUris":[
+				"[variables('scriptHostUrltz')]",
+				"[variables('scriptHostUrleco')]"
+		  ]	  
+        },
+	 "protectedSettings":{
+                    "commandToExecute": "[concat('sudo python2.6 tdc-timezone.py ',parameters('tdcTimeZone'),' && sh eco_ansi.sh ',parameters('tdcTimeZone'),' \"',parameters('generateHostFileParam'),'\"',' \"',parameters('ansibleparam'),'\"',' ',parameters('dmPassword'))]"
+		}
+      }
+    }		
+  ],
+  "outputs": {   
+    
+  }
+}

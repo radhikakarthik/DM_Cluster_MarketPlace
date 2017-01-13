@@ -1,0 +1,104 @@
+{
+ "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "apiVersions": {
+      "type": "object",
+      "metadata": {
+        "description": "Object with all relevant API versions passed from the mainTemplate"
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location for the deployed resources"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network name (e.g. vnet-xyz)"
+      }
+    },
+    "vnetResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network Resource Group"
+      }
+    },
+    "vnetAddressSpace": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network Address Prefix (i.e. CIDR)"
+      }
+    },
+    "vmSubnetName": {
+      "type": "string",
+      "defaultValue": "vmsubnet",
+      "metadata": {
+        "description": "VM Subnet"
+      }
+    },
+    "vmSubnetAddressSpace": {
+      "type": "string",
+      "metadata": {
+        "description": "VM Subnet Address Space"
+      }
+    },
+    "existingNSGName": {
+      "type": "string",
+      "metadata": {
+        "description": "Network Security Group Name"
+      }
+    },
+    "nsgResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Network Security Resource Group Name"
+      }
+    } ,
+     "teradataTags": {
+      "type": "object",
+      "metadata": {
+        "description": "Tags for teradata resources"
+      }
+    }
+  },
+  "variables": {
+    "subnetNsgName": "[parameters('existingNSGName')]",
+    "vnetID": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "[parameters('apiVersions').network.virtualNetworks]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('vnetName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressSpace')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('vmSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('vmSubnetAddressSpace')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId(parameters('NSGResourceGroup'),'Microsoft.Network/networkSecurityGroups', parameters('existingNSGName'))]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "vnetID": {
+      "type": "string",
+      "value": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks',parameters('vnetName'))]"
+    }
+  }
+}
