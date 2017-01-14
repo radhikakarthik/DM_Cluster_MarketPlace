@@ -391,7 +391,7 @@
 				    "sourceAddressPrefix": "*",
 				    "destinationAddressPrefix": "*",
 				    "access": "Allow",
-				    "priority": 101,
+				    "priority": 102,
 				    "direction": "Inbound"
 				}
 			  },
@@ -405,7 +405,7 @@
               "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
               "destinationAddressPrefix": "*",
               "access": "Allow",
-              "priority": 102,
+              "priority": 103,
               "direction": "Inbound"
             }
           },
@@ -419,7 +419,7 @@
 				  "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
 				  "destinationAddressPrefix": "*",
 				  "access": "Allow",
-				  "priority": 107,
+				  "priority": 104,
 				  "direction": "Inbound"
 				}
 			  },
@@ -433,7 +433,7 @@
 				  "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
 				  "destinationAddressPrefix": "*",
 				  "access": "Allow",
-				  "priority": 108,
+				  "priority": 105,
 				  "direction": "Inbound"
 				}
 			  },
@@ -461,7 +461,7 @@
 				  "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
 				  "destinationAddressPrefix": "*",
 				  "access": "Allow",
-				  "priority": 105,
+				  "priority": 107,
 				  "direction": "Inbound"
 				}
 			  },
@@ -475,7 +475,7 @@
 				    "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
 				    "destinationAddressPrefix": "*",
 				    "access": "Allow",
-				    "priority": 104,
+				    "priority": 108,
 				    "direction": "Inbound"
 			  	}
 			  },
@@ -489,7 +489,7 @@
 				  "sourceAddressPrefix": "[parameters('vmSubnetAddressSpace')]",
 				  "destinationAddressPrefix": "*",
 				  "access": "Allow",
-				  "priority": 103,
+				  "priority": 109,
 				  "direction": "Inbound"
 				}
 			  },
@@ -503,7 +503,7 @@
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
               "access": "Allow",
-              "priority": 115,
+              "priority": 110,
               "direction": "Inbound"
             }
           }
