@@ -328,7 +328,7 @@
 			  "dmVMSize": {
 				"value": "[parameters('dmClusterVmSize')]"
 			  },
-         "subnet1DMID":{
+                          "subnet1DMID":{
 			    "value":"[variables('subnet1ID')]"
 			  },	
 			  "dmSubnetStartAddress":{
@@ -340,9 +340,6 @@
 			  "imageOffer":{
 			   "value":"[variables('imageOfferDM')]"
 			  },
-			  "subnet1DMID":{
-			    "value":"[variables('subnet1ID')]"
-			  },	
 			  "imageSku":{
 			   "value":"[variables('imageSkuDM')]"
 			  },
