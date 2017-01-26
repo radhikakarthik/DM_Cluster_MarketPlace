@@ -48,10 +48,10 @@
 							"name": "dmDBCPassword",
 							"type": "Microsoft.Common.PasswordBox",
 							"label": {
-							 "password":"DBC Password",
-							 "confirmPassword": "Confirm DBC Password"
+							 "password":"DBC user password",
+							 "confirmPassword": "Confirm DBC user password"
 							},
-							"toolTip": "DBC Password for the Data Mover Internal Repository",
+							"toolTip": "Password for DBC user in the Data Mover internal repository",
 							"constraints": {
 							  "required": true,
 							  "regex": "^[A-Za-z][a-z0-9A-Z]{7,14}$",
@@ -62,10 +62,10 @@
 							"name": "dmIntPassword",
 							"type": "Microsoft.Common.PasswordBox",
 							"label": {
-							 "password":"DATAMOVER  Password",
-							 "confirmPassword": "Confirm DATAMOVER  Password"
+							 "password":"DATAMOVER user password",
+							 "confirmPassword": "Confirm DATAMOVER user password"
 							},
-							"toolTip": "DATAMOVER Password for the Data Mover Internal repository",
+							"toolTip": "Password for DATAMOVER user in the Data Mover Internal repository",
 							"constraints": {
 							  "required": true,
 							  "regex": "^[A-Za-z][a-z0-9A-Z]{7,14}$",
