@@ -114,10 +114,10 @@
 							]
 						  },
 						  "osPlatform": "Linux", 
-                                                    "imageReference": {
+                                                  "imageReference": {
 						  "publisher": "teradata",
-						  "offer": "teradatadatamoverdec21-preview",
-						  "sku": "teradatadatamoverdec21"
+                                                  "offer": "teradata-data-mover-preview",
+						  "sku": "teradata-data-mover-hourly"
 						  },	
       						  "count":"[add(int(coalesce(steps('dataMoverConfig').dmAgentNodeCount,0)),1)]"
 
