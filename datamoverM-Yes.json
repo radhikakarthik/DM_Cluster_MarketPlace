@@ -252,7 +252,7 @@
     "diagnosticsStorageAccount": "[concat('dmdiag',uniqueString(resourceGroup().id,'d'))]",	
 	"s1": "[split(parameters('dmSubnetStartAddress'),'.')]",
 	"scriptHostUrltz":"[concat(parameters('scriptUrlInit'),'tdc-timezone.py')]",
-	"scriptHostUrleco":"[concat(parameters('scriptUrlInit'),'eco_config.sh')]",
+	"scriptHostUrleco":"[concat(parameters('scriptUrlInit'),'eco_ansi.sh')]",
 	"publicIPAddressType":"Static",
     "nsgName": "dm-nsg"    	  	
   },
