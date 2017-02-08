@@ -164,6 +164,20 @@
 			"description":"File script url for generating hosts and all file"
 		}	
 	},	
+
+        "generateHostFileParam":{
+	 "type":"string",
+	 "metadata":{
+	   "description":"Parmeter for script host file"
+	 }	
+	},
+
+	"ansibleparam":{
+	 "type":"string",
+	 "metadata":{
+	   "description":"Parmeter for ansible script file"
+	 }	
+	},
 	"teradataTags":{
 	 "type":"object",
 	 "metadata":{
@@ -661,7 +675,7 @@
 		  ]	  
         },
 	 "protectedSettings":{
-		    "commandToExecute": "[concat('sudo python2.6 tdc-timezone.py ',parameters('tdcTimeZone'),' && sh eco_config.sh ',parameters('tdcTimeZone'))]"
+                     "commandToExecute": "[concat('sudo python2.6 tdc-timezone.py ',parameters('tdcTimeZone'),' && sh eco_ansi.sh ',parameters('tdcTimeZone'),' \"',parameters('generateHostFileParam'),'\"',' \"',parameters('ansibleparam'),'\"',' ',parameters('dmPassword'))]"
 		}
       }
     }	
