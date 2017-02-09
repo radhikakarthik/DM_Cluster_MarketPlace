@@ -168,7 +168,7 @@
 										},
 										"constraints": {
 											"minAddressPrefixSize": "/26",
-											"minAddressCount": "[steps('dataMoverConfig').dmAgentNodeCount]",
+											"minAddressCount": "[add(steps('dataMoverConfig').dmAgentNodeCount),1]",
 											"requireContiguousAddresses": true
 										}
 									}
