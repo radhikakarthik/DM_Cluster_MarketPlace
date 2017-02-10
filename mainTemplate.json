@@ -216,8 +216,9 @@
                 "dmImageStorageAccountType":"Premium_LRS",
                 "dmSharedStorageAccountType":"Premium_LRS",
                 "dmSubnetStartAddress":"[parameters('vmSubnetStartAddress')]",
-                "dmagentSubnetStartAddress":"[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('dmMasterCount')),256)), '.', mod(add(int(variables('s1')[3]),variables('dmMasterCount'))),256))]",
+                "dmagentSubnetStartAddress":"[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('dmMasterCount')),256)), '.', mod(add(int(variables('s1')[3]),variables('dmMasterCount')),256))]",
 		"dmHostFileParamM":"[concat(' --dm_master ',parameters('dmSystemPrefix'),'DMMasterAgent',',',variables('dmMasterCount'),',',variables('dmSubnetStartAddress'))]",
+
         "dmHostFileParamA":"[concat(' --dm_agent ',parameters('dmSystemPrefix'),'DMAgent',',',parameters('dmAgentNodeCount'),',',variables('dmagentSubnetStartAddress'))]",
         "dmHostFileParam_0":"[variables('dmHostFileParamM')]",
         "dmHostFileParam_1":"[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
