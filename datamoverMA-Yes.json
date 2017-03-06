@@ -244,7 +244,6 @@
 	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'32'),'32')]",
 	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'33'),'33')]"
     ],   
-	"diskCaching":"None",
 	"datadiskSize":256,	
 	"publicIPAddressName":"[concat(parameters('dmSystemPrefix'),'-','publicip')]",
 	"publicIPAddressDomainNameLabel":"[concat(parameters('dmSystemPrefix'),'-',uniqueString(resourceGroup().id))]",
