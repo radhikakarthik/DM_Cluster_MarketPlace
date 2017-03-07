@@ -245,6 +245,7 @@
 	  "[concat(uniqueString('s',parameters('dmSystemPrefix'),resourceGroup().id,'33'),'33')]"
     ],   
 	"datadiskSize":256,	
+  "diskCaching":"None",
 	"publicIPAddressName":"[concat(parameters('dmSystemPrefix'),'-','publicip')]",
 	"publicIPAddressDomainNameLabel":"[concat(parameters('dmSystemPrefix'),'-',uniqueString(resourceGroup().id))]",
 	"dataStoreStorageAccountCount": "[add(div(parameters('dmSystemCount'),4),1)]",
@@ -604,7 +605,8 @@
                         {
                             "name": "[concat('datadisk1',copyIndex())]",                            
                             "lun": 0,
-							"createOption": "FromImage",							
+						              	"createOption": "FromImage",	
+                            "caching": "[variables('diskCaching')]",							
                             "vhd": {							
                                 "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk1',copyIndex()),'.vhd')]"
                             }                            
@@ -612,15 +614,17 @@
                         {
                             "name": "[concat('datadisk2',copyIndex())]",                            
                             "lun": 1,
-                            "createOption": "FromImage",							
-							"vhd": {
+                            "createOption": "FromImage",
+                            "caching": "[variables('diskCaching')]",								
+					              		"vhd": {
                                 "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk2',copyIndex()),'.vhd')]"
                             }                            
                         },
 						{
                             "name": "[concat('datadisk3',copyIndex())]",                            
                             "lun": 2,
-							"createOption": "FromImage",							
+						              	"createOption": "FromImage",		
+                            "caching": "[variables('diskCaching')]",						
                             "vhd": {							
                                 "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk3',copyIndex()),'.vhd')]"
                             }                            
@@ -628,8 +632,9 @@
                         {
                             "name": "[concat('datadisk4',copyIndex())]",                            
                             "lun": 3,
-                            "createOption": "FromImage",							
-							"vhd": {
+                            "createOption": "FromImage",		
+                            "caching": "[variables('diskCaching')]",						
+					              		"vhd": {
                                 "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk4',copyIndex()),'.vhd')]"
                             }                            
                         }
