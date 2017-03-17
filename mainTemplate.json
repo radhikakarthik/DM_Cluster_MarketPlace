@@ -1,390 +1,384 @@
 	{
-	  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-	  "contentVersion": "1.0.0.0",
-	  "parameters": {
-		"artifactsBaseUrl": {
-		  "type": "string",
-		  "defaultValue": "https://raw.githubusercontent.com/radhikakarthik/DM_Cluster_MarketPlace/master",
-		  "metadata": {
-			"description": "Base URL of the solution template gallery package not including the trailing slash",
-			"artifactsBaseUrl": ""
-		  }
-		},
-		"location": {
-		  "type": "string",		  
-		  "metadata": {
-			"description": "Location were resources will be deployed"
-		  }
-		},
-		"adminUsername": {		  
-		  "type": "string",		
-		  "metadata": {
-			"description": "Username for administrator of virtual machines and SSH"
-		  }
-		},
-		"authenticationType": {
-		  "type": "string",	
-		  "allowedValues": [
-			"password",
-			"sshPublicKey"
-		  ],		  
-		  "metadata": {
-			"description": "Authentication type for the virtual machines"
-		  }
-		},
-		"adminPassword": {
-		  "type": "securestring",
-		  "defaultValue": "",		  
-		  "metadata": {
-			"description": "Admin password for the virtual machines and SSH. Keep empty if providing SSH Public Key authentication type."
-		  }
-		},
-		"sshPublicKey": {
-		  "type": "string",
-		  "defaultValue": "",		  
-		  "metadata": {
-			"description": "SSH public key that will be included on all nodes in the cluster. The OpenSSH public key can be generated with tools like ssh-keygen on Linux or OS X."
-		  }
-             },
-             		"tdcTimeZone": {           
-            "type": "string",			
-            "metadata": {
-                "description": "Time zone for TDC Network"
-            }
-            },
-		"ntpServerlist": {           
-            "type": "string",			
-            "metadata": {
-                "description": "comma separated ntp server list"
-            }
-        },
-		"vnetResourceGroup": {
-		  "type": "string",
-		  "metadata": {
-			"description": "Virtual Network Resource Group for cases when cluster nodes are deployed into an existing VNet"
-		  }
-		},
-		"vnetName": {
-		  "type": "string",		  
-		  "metadata": {
-			"description": "Virtual Network name"
-		  }
-		},
-		"vnetNewOrExisting": {
-		  "type": "string",	
-           "allowedValues": [
+		"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+		"contentVersion": "1.0.0.0",
+		"parameters": {
+			"artifactsBaseUrl": {
+				"type": "string",
+				"defaultValue": "https://raw.githubusercontent.com/radhikakarthik/DM_Cluster_MarketPlace/master",
+				"metadata": {
+					"description": "Base URL of the solution template gallery package not including the trailing slash",
+					"artifactsBaseUrl": ""
+				}
+			},
+			"location": {
+				"type": "string",
+				"metadata": {
+					"description": "Location were resources will be deployed"
+				}
+			},
+			"adminUsername": {
+				"type": "string",
+				"metadata": {
+					"description": "Username for administrator of virtual machines and SSH"
+				}
+			},
+			"authenticationType": {
+				"type": "string",
+				"allowedValues": [
+					"password",
+					"sshPublicKey"
+				],
+				"metadata": {
+					"description": "Authentication type for the virtual machines"
+				}
+			},
+			"adminPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Admin password for the virtual machines and SSH. Keep empty if providing SSH Public Key authentication type."
+				}
+			},
+			"sshPublicKey": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "SSH public key that will be included on all nodes in the cluster. The OpenSSH public key can be generated with tools like ssh-keygen on Linux or OS X."
+				}
+			},
+			"tdcTimeZone": {
+				"type": "string",
+				"metadata": {
+					"description": "Time zone for TDC Network"
+				}
+			},
+			"ntpServerlist": {
+				"type": "string",
+				"metadata": {
+					"description": "comma separated ntp server list"
+				}
+			},
+			"vnetResourceGroup": {
+				"type": "string",
+				"metadata": {
+					"description": "Virtual Network Resource Group for cases when cluster nodes are deployed into an existing VNet"
+				}
+			},
+			"vnetName": {
+				"type": "string",
+				"metadata": {
+					"description": "Virtual Network name"
+				}
+			},
+			"vnetNewOrExisting": {
+				"type": "string",
+				"allowedValues": [
 					"new",
 					"existing"
-				],  
-		  "metadata": {
-			"description": "Parameter that specifies if an new or an existing virtual network should be used for deploying cluster nodes"
-		  }
-		},
-		"vnetAddressSpace": {
-		  "type": "string",
-		  "defaultValue":"10.1.0.0/16",
-		  "metadata": {
-			"description": "Virtual Network Address Prefix (i.e. CIDR)"
-		  }
-		},
-		"vmSubnetName": {
-		  "type": "string",			  
-		  "metadata": {
-			"description": "VM Subnet"
-		  }
-		},
-		"vmSubnetAddressSpace": {
-		  "type": "string",			  		  
-		  "metadata": {
-			"description": "VM Subnet Address Space"
-		  }
-		},
-		"vmSubnetStartAddress": {
-		  "type": "string",			  
-		  "metadata": {
-			"description": "VMSubnet Start Address"
-		  }
-		},
-	"sourceAddressSpace": {
+				],
+				"metadata": {
+					"description": "Parameter that specifies if an new or an existing virtual network should be used for deploying cluster nodes"
+				}
+			},
+			"vnetAddressSpace": {
+				"type": "string",
+				"defaultValue": "10.1.0.0/16",
+				"metadata": {
+					"description": "Virtual Network Address Prefix (i.e. CIDR)"
+				}
+			},
+			"vmSubnetName": {
+				"type": "string",
+				"metadata": {
+					"description": "VM Subnet"
+				}
+			},
+			"vmSubnetAddressSpace": {
+				"type": "string",
+				"metadata": {
+					"description": "VM Subnet Address Space"
+				}
+			},
+			"vmSubnetStartAddress": {
+				"type": "string",
+				"metadata": {
+					"description": "VMSubnet Start Address"
+				}
+			},
+			"sourceAddressSpace": {
 				"type": "string",
 				"metadata": {
 					"description": "CIDR block defining acceptable address range for remote SSH access"
 				}
 			},
-	    "dmPassword": {
-		  "type": "securestring",
-		   "defaultValue": "",
-		  "metadata": {
-			"description": "Password for administrator datamover"
-		  }
-		},
-		"dmSshPublicKey":{
-		 "type":"string",
-		 "defaultValue": "",
-		 "metadata":{
-			"description":"SSH public key for datamover"
-		 }
-		},		
-		"dmDBCPassword": {
-		  "type": "securestring",
-		  "defaultValue": "",		  
-		  "metadata": {
-			"description": "DBC Password for the Data Mover internal repository"
-		  }
-		},
-		"dmIntPassword": {
-		  "type": "securestring",
-		  "defaultValue": "",		  
-		  "metadata": {
-			"description": "DATAMOVER password for the Data Mover internal repository"
-		  }
-		},
-		"dmSystemPrefix":{
-		  "type":"string",
-		  "defaultValue":"datamover",
-		  "metadata":{
-		    "description":"Datamover system prefix"
-		  }		
-		},
-                "dmSystemCount": {
+			"dmPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Password for administrator datamover"
+				}
+			},
+			"dmSshPublicKey": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "SSH public key for datamover"
+				}
+			},
+			"dmDBCPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "DBC Password for the Data Mover internal repository"
+				}
+			},
+			"dmIntPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "DATAMOVER password for the Data Mover internal repository"
+				}
+			},
+			"dmSystemPrefix": {
+				"type": "string",
+				"defaultValue": "datamover",
+				"metadata": {
+					"description": "Datamover system prefix"
+				}
+			},
+			"dmSystemCount": {
 				"type": "int",
 				"defaultValue": 1,
 				"metadata": {
 					"description": "Number of DM VMs"
 				}
 			},
-		"dmAgentNodeCount":{
-		 "type":"int",
-		 "defaultValue": 0,
-		 "metadata":{
-		   "description":"Number of Additional Data Mover Agents(Min:0 Max: 3)"
-		 }		
-		},
-		"dmClusterVmSize":{
-		  "type":"string",
-		  "defaultValue":"",
-		  "metadata":{
-		    "description":"Data mover cluster VM size"
-		  } 
-		},
-                "teradataTags": {
+			"dmAgentNodeCount": {
+				"type": "int",
+				"defaultValue": 0,
+				"metadata": {
+					"description": "Number of Additional Data Mover Agents(Min:0 Max: 3)"
+				}
+			},
+			"dmClusterVmSize": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Data mover cluster VM size"
+				}
+			},
+			"teradataTags": {
 				"type": "object",
 				"defaultValue": {
 					"provider": "1C8BE09A-CE46-4BF1-A01B-F570FE1EA1B3"
 				}
 			}
-          },
-         "variables": {
-		"apiVersions": {
-		  "resources": {
-			"deployments": "2016-09-01"
-		  },
-		"storage": {
-			"storageAccounts": "2016-05-01"
-		  },
-		"network": {
-			"virtualNetworks": "2016-03-30",
-			"networkInterfaces": "2016-03-30",
-			"loadBalancers": "2016-03-30",
-			"publicIPAddresses": "2016-03-30",
-			"networkSecurityGroups": "2016-03-30"
-		  },
-		"compute": {
-			"availabilitySets": "2016-03-30",
-			"virtualMachines": "2016-03-30",
-			"virtualMachineExtensions": "2016-03-30"
-		  }
-		},		
-		"baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",	
-		"templateUrlVnet": "[concat(variables('baseUrl'),'vnet-',parameters('vnetNewOrExisting'),'.json')]",	
-		"defaultDatamoverUrl_0":"[concat(variables('baseUrl'),'datamoverM-Yes.json')]",
-		"defaultDatamoverUrl_1":"[concat(variables('baseUrl'),'datamoverMA-Yes.json')]",
-		"defaultDatamoverUrl_2":"[concat(variables('baseUrl'),'datamoverMA-Yes.json')]",
-		"defaultDatamoverUrl_3":"[concat(variables('baseUrl'),'datamoverMA-Yes.json')]",		
-		"templateUrlDatamover":"[variables(concat('defaultDatamoverUrl_',parameters('dmAgentNodeCount')))]",
-                "imagePublisherDM":"teradata",
-		"imageOfferDM":"teradata-data-mover-preview",
-		"imageSkuDM":"teradata-data-mover-hourly",
-		"imageOfferAgent":"teradata-data-mover-agent-preview",
-		"imageSkuAgent":"teradata-data-mover-agent-hourly",	
-                "vnetID":"[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
-               	"subnet1ID": "[concat(variables('vnetID'),'/subnets/',parameters('vmSubnetName'))]",
-               	"s1": "[split(parameters('vmSubnetStartAddress'),'.')]",
-                "dmMasterCount":1,
-		"dmSystemCount":"[add(1,parameters('dmAgentNodeCount'))]",
-		"datamoverAddressCount":"[parameters('dmSystemCount')]",		
-                "dmImageStorageAccountType":"Premium_LRS",
-                "dmSharedStorageAccountType":"Premium_LRS",
-                "dmSubnetStartAddress":"[parameters('vmSubnetStartAddress')]",
-                "dmagentSubnetStartAddress":"[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('dmMasterCount')),256)), '.', mod(add(int(variables('s1')[3]),variables('dmMasterCount')),256))]",
-		"dmHostFileParamM":"[concat(' --dm_master ',parameters('dmSystemPrefix'),'DMMasterAgent',',',variables('dmMasterCount'),',',variables('dmSubnetStartAddress'))]",
-
-        "dmHostFileParamA":"[concat(' --dm_agent ',parameters('dmSystemPrefix'),'DMAgent',',',parameters('dmAgentNodeCount'),',',variables('dmagentSubnetStartAddress'))]",
-        "dmHostFileParam_0":"[variables('dmHostFileParamM')]",
-        "dmHostFileParam_1":"[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
-        "dmHostFileParam_2":"[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
-        "dmHostFileParam_3":"[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
-        "dmHostFileParam_No":"",
-        "dmHostFileParam_Yes":"[variables(concat('dmHostFileParam_',parameters('dmAgentNodeCount')))]"	,
-        
-        "dmAnsible_Yes":"[concat('  dm_dbc_password=',parameters('dmDBCPassword'),' ntp_server_list=',parameters('ntpServerlist'),' dm_datamover_password=',parameters('dmIntPassword'))]",
-        "generateHostFileParam":"[variables('dmHostFileParam_Yes')]",
-        "ansibleparam":"[concat('cloud_env=aws dm_only=yes ntp_server_list=',parameters('ntpServerlist'), variables('dmAnsible_Yes'))]",
- 
-	"vnet":"[concat('vnet',uniqueString(resourceGroup().id))]",
-	"publicIP":"[concat('publicIP',uniqueString(resourceGroup().id))]",
-	"datamover":"[concat('datamover',uniqueString(resourceGroup().id))]"
-	  },
-	  "resources": [
-		{
-		  "apiVersion": "[variables('apiVersions').resources.deployments]",
-		  "type": "Microsoft.Resources/deployments",
-		  "name":"[variables('vnet')]",		 
-		  "dependsOn": [		   
-		  ],
-		  "properties": {
-			"mode": "Incremental",
-			"templateLink": {
-			  "uri": "[variables('templateUrlVnet')]",
-			  "contentVersion": "1.0.0.0"
-			},
-			"parameters": {
-			  "apiVersions":{
-				"value":"[variables('apiVersions')]"
-			  },
-			  "location": {
-				"value": "[parameters('location')]"
-			  },
-			  "vnetName": {
-				"value": "[parameters('vnetName')]"
-			  },
-			  "vnetResourceGroup": {
-				"value": "[parameters('vnetResourceGroup')]"
-			  },
-			  "vnetAddressSpace": {
-				"value": "[parameters('vnetAddressSpace')]"
-			  },
-			  "vmSubnetName": {
-				"value": "[parameters('vmSubnetName')]"
-			  },
-			  "vmSubnetAddressSpace": {
-				"value": "[parameters('vmSubnetAddressSpace')]"
-			  },
-        "teradataTags": {
-		           "value": "[parameters('teradataTags')]"
-				}
-			}
-			}
 		},
-		{
-		  "apiVersion": "[variables('apiVersions').resources.deployments]",
-		  "type": "Microsoft.Resources/deployments",
-		  "name": "[variables('datamover')]",
-		  "dependsOn": [
-			"[variables('vnet')]"			
-		  ],
-		  "properties": {
-			"mode": "Incremental",
-			"templateLink": {
-			  "uri": "[variables('templateUrlDatamover')]",
-			  "contentVersion": "1.0.0.0"
+		"variables": {
+			"apiVersions": {
+				"resources": {
+					"deployments": "2016-09-01"
+				},
+				"storage": {
+					"storageAccounts": "2016-12-01"
+				},
+				"network": {
+					"virtualNetworks": "2016-03-30",
+					"networkInterfaces": "2016-03-30",
+					"loadBalancers": "2016-03-30",
+					"publicIPAddresses": "2016-03-30",
+					"networkSecurityGroups": "2016-03-30"
+				},
+				"compute": {
+					"availabilitySets": "2016-03-30",
+					"virtualMachines": "2016-03-30",
+					"virtualMachineExtensions": "2016-03-30"
+				}
 			},
-			"parameters": {
-			  "apiVersions":{
-				"value":"[variables('apiVersions')]"
-			  },
-			  "location": {
-				"value": "[parameters('location')]"
-			  },
-			  "adminUsername": {
-				"value": "[parameters('adminUsername')]"
-			  },
-			  "dmPassword": {
-				"value": "[parameters('dmPassword')]"
-			  },
-			  "dmSshPublicKey":{
-			    "value":"[parameters('dmSshPublicKey')]"
-			  },
-			  "dmAuthenticationType":{
-				"value":"[parameters('authenticationType')]"
-			  },
-			  "dmDBCPassword":{
-				"value":"[parameters('dmDBCPassword')]"
-			  },
-			  "dmIntPassword":{
-				"value":"[parameters('dmIntPassword')]"
-			  },
-			  "dmSystemPrefix":{
-			    "value":"[parameters('dmSystemPrefix')]"
-			  },
-			  "dmSystemCount":{
-			    "value":"[variables('dmSystemCount')]"
-			  },
-			  "dmAgentCount": {
-				"value": "[parameters('dmAgentNodeCount')]"
-			  },
-			  "dmMasterCount":{
-				"value":"[variables('dmMasterCount')]"
-			  },
-			  "dmVMSize": {
-				"value": "[parameters('dmClusterVmSize')]"
-			  },
-                          "subnet1DMID":{
-			    "value":"[variables('subnet1ID')]"
-			  },	
-			  "dmSubnetStartAddress":{
-			    "value":"[variables('dmSubnetStartAddress')]"
-			  },
-			  "imagePublisher":{
-			   "value":"[variables('imagePublisherDM')]"
-			  },
-			  "imageOffer":{
-			   "value":"[variables('imageOfferDM')]"
-			  },
-			  "imageSku":{
-			   "value":"[variables('imageSkuDM')]"
-			  },
-			  "imageOfferAgent":{
-			    "value":"[variables('imageOfferAgent')]"			  
-			  },
-			  "imageSkuAgent":{
-			    "value":"[variables('imageSkuAgent')]"			  
-			  },
-        "imageStorageAccountType":{
-				"value": "[variables('dmImageStorageAccountType')]"
-			  },
-        "sharedStorageAccountType":{
-			   "value": "[variables('dmSharedStorageAccountType')]"
-			  },
-			  "tdcTimeZone":{
-			   "value": "[parameters('tdcTimeZone')]"
-			  },
-			  "ntpServerlist":{
-			   "value": "[parameters('ntpServerlist')]"
-			  },
-				"sourceAddressSpace": {
+			"baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
+			"templateUrlVnet": "[concat(variables('baseUrl'),'vnet-',parameters('vnetNewOrExisting'),'.json')]",
+			"defaultDatamoverUrl_0": "[concat(variables('baseUrl'),'datamoverM-Yes.json')]",
+			"defaultDatamoverUrl_1": "[concat(variables('baseUrl'),'datamoverMA-Yes.json')]",
+			"defaultDatamoverUrl_2": "[concat(variables('baseUrl'),'datamoverMA-Yes.json')]",
+			"defaultDatamoverUrl_3": "[concat(variables('baseUrl'),'datamoverMA-Yes.json')]",
+			"templateUrlDatamover": "[variables(concat('defaultDatamoverUrl_',parameters('dmAgentNodeCount')))]",
+			"imagePublisherDM": "teradata",
+			"imageOfferDM": "teradata-data-mover-preview",
+			"imageSkuDM": "teradata-data-mover-hourly",
+			"imageOfferAgent": "teradata-data-mover-agent-preview",
+			"imageSkuAgent": "teradata-data-mover-agent-hourly",
+			"vnetID": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+			"subnet1ID": "[concat(variables('vnetID'),'/subnets/',parameters('vmSubnetName'))]",
+			"s1": "[split(parameters('vmSubnetStartAddress'),'.')]",
+			"dmMasterCount": 1,
+			"dmSystemCount": "[add(1,parameters('dmAgentNodeCount'))]",
+			"datamoverAddressCount": "[parameters('dmSystemCount')]",
+			"dmImageStorageAccountType": "Premium_LRS",
+			"dmSharedStorageAccountType": "Premium_LRS",
+			"dmSubnetStartAddress": "[parameters('vmSubnetStartAddress')]",
+			"dmagentSubnetStartAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('dmMasterCount')),256)), '.', mod(add(int(variables('s1')[3]),variables('dmMasterCount')),256))]",
+			"dmHostFileParamM": "[concat(' --dm_master ',parameters('dmSystemPrefix'),'DMMasterAgent',',',variables('dmMasterCount'),',',variables('dmSubnetStartAddress'))]",
+			"dmHostFileParamA": "[concat(' --dm_agent ',parameters('dmSystemPrefix'),'DMAgent',',',parameters('dmAgentNodeCount'),',',variables('dmagentSubnetStartAddress'))]",
+			"dmHostFileParam_0": "[variables('dmHostFileParamM')]",
+			"dmHostFileParam_1": "[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
+			"dmHostFileParam_2": "[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
+			"dmHostFileParam_3": "[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
+			"dmHostFileParam_No": "",
+			"dmHostFileParam_Yes": "[variables(concat('dmHostFileParam_',parameters('dmAgentNodeCount')))]",
+			"dmAnsible_Yes": "[concat('  dm_dbc_password=',parameters('dmDBCPassword'),' ntp_server_list=',parameters('ntpServerlist'),' dm_datamover_password=',parameters('dmIntPassword'))]",
+			"generateHostFileParam": "[variables('dmHostFileParam_Yes')]",
+			"ansibleparam": "[concat('cloud_env=aws dm_only=yes ntp_server_list=',parameters('ntpServerlist'), variables('dmAnsible_Yes'))]",
+			"vnet": "[concat('vnet',uniqueString(resourceGroup().id))]",
+			"publicIP": "[concat('publicIP',uniqueString(resourceGroup().id))]",
+			"datamover": "[concat('datamover',uniqueString(resourceGroup().id))]"
+		},
+		"resources": [
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('vnet')]",
+				"dependsOn": [],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlVnet')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"vnetName": {
+							"value": "[parameters('vnetName')]"
+						},
+						"vnetResourceGroup": {
+							"value": "[parameters('vnetResourceGroup')]"
+						},
+						"vnetAddressSpace": {
+							"value": "[parameters('vnetAddressSpace')]"
+						},
+						"vmSubnetName": {
+							"value": "[parameters('vmSubnetName')]"
+						},
+						"vmSubnetAddressSpace": {
+							"value": "[parameters('vmSubnetAddressSpace')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('datamover')]",
+				"dependsOn": [
+					"[variables('vnet')]"
+				],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlDatamover')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"adminUsername": {
+							"value": "[parameters('adminUsername')]"
+						},
+						"dmPassword": {
+							"value": "[parameters('dmPassword')]"
+						},
+						"dmSshPublicKey": {
+							"value": "[parameters('dmSshPublicKey')]"
+						},
+						"dmAuthenticationType": {
+							"value": "[parameters('authenticationType')]"
+						},
+						"dmDBCPassword": {
+							"value": "[parameters('dmDBCPassword')]"
+						},
+						"dmIntPassword": {
+							"value": "[parameters('dmIntPassword')]"
+						},
+						"dmSystemPrefix": {
+							"value": "[parameters('dmSystemPrefix')]"
+						},
+						"dmSystemCount": {
+							"value": "[variables('dmSystemCount')]"
+						},
+						"dmAgentCount": {
+							"value": "[parameters('dmAgentNodeCount')]"
+						},
+						"dmMasterCount": {
+							"value": "[variables('dmMasterCount')]"
+						},
+						"dmVMSize": {
+							"value": "[parameters('dmClusterVmSize')]"
+						},
+						"subnet1DMID": {
+							"value": "[variables('subnet1ID')]"
+						},
+						"dmSubnetStartAddress": {
+							"value": "[variables('dmSubnetStartAddress')]"
+						},
+						"imagePublisher": {
+							"value": "[variables('imagePublisherDM')]"
+						},
+						"imageOffer": {
+							"value": "[variables('imageOfferDM')]"
+						},
+						"imageSku": {
+							"value": "[variables('imageSkuDM')]"
+						},
+						"imageOfferAgent": {
+							"value": "[variables('imageOfferAgent')]"
+						},
+						"imageSkuAgent": {
+							"value": "[variables('imageSkuAgent')]"
+						},
+						"imageStorageAccountType": {
+							"value": "[variables('dmImageStorageAccountType')]"
+						},
+						"sharedStorageAccountType": {
+							"value": "[variables('dmSharedStorageAccountType')]"
+						},
+						"tdcTimeZone": {
+							"value": "[parameters('tdcTimeZone')]"
+						},
+						"ntpServerlist": {
+							"value": "[parameters('ntpServerlist')]"
+						},
+						"sourceAddressSpace": {
 							"value": "[parameters('sourceAddressSpace')]"
 						},
-			  "scriptUrlInit":{
-				"value":"[variables('baseUrl')]"
-			  },
-        "generateHostFileParam":{
-			    "value":"[variables('generateHostFileParam')]"
-			  },
-				 "vmSubnetAddressSpace": {
-				"value": "[parameters('vmSubnetAddressSpace')]"
-			  },
-			  "ansibleparam":{
-				"value":"[variables('ansibleparam')]"
-			  },
-			  "teradataTags": {
-				"value": "[parameters('teradataTags')]"
-		          }
+						"scriptUrlInit": {
+							"value": "[variables('baseUrl')]"
+						},
+						"generateHostFileParam": {
+							"value": "[variables('generateHostFileParam')]"
+						},
+						"vmSubnetAddressSpace": {
+							"value": "[parameters('vmSubnetAddressSpace')]"
+						},
+						"ansibleparam": {
+							"value": "[variables('ansibleparam')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
 			}
-		}	
-		}	
-	  ],
-	  "outputs": {
-		
-	  }
+		],
+		"outputs": {}
 	}

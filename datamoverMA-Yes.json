@@ -269,26 +269,6 @@
       }
     },
     {
-      "apiVersion": "[parameters('apiVersions').network.publicIPAddresses]",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(variables('publicIPAddressName'),copyIndex())]",
-      "location": "[parameters('location')]",
-      "tags": {
-        "provider": "[toUpper(parameters('teradataTags').provider)]"
-      },
-      "copy": {
-        "name": "publicIPCopy",
-        "count": "[parameters('dmSystemCount')]"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
-        "dnsSettings": {
-          "domainNameLabel": "[concat(variables('publicIPAddressDomainNameLabel'), copyIndex())]"
-        },
-        "idleTimeoutInMinutes": 30
-      }
-    },
-    {
       "apiVersion": "[parameters('apiVersions').storage.storageAccounts]",
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('diagnosticsStorageAccount')]",
@@ -486,7 +466,6 @@
         "provider": "[toUpper(parameters('teradataTags').provider)]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'),copyIndex())]",
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgname'))]"
       ],
       "copy": {
@@ -503,9 +482,6 @@
             "properties": {
               "privateIPAllocationMethod": "Static",
               "privateIPAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),copyIndex()),256)), '.', mod(add(int(variables('s1')[3]),copyIndex()),256))]",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('publicIPAddressName'),copyIndex()))]"
-              },
               "subnet": {
                 "id": "[parameters('subnet1DMID')]"
               }
@@ -561,7 +537,7 @@
           "osDisk": {
             "name": "osdisk",
             "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,'vhds/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],parameters('dmSystemPrefix'),copyIndex(),'-osdisk.vhd')]"
+              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), parameters('apiVersions').storage.storageAccounts).primaryEndpoints.blob,'vhds/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],parameters('dmSystemPrefix'),copyIndex(),'-osdisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -573,7 +549,7 @@
               "createOption": "FromImage",
               "caching": "[variables('diskCaching')]",
               "vhd": {
-                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk1',copyIndex()),'.vhd')]"
+                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), parameters('apiVersions').storage.storageAccounts).primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk1',copyIndex()),'.vhd')]"
               }
             },
             {
@@ -582,7 +558,7 @@
               "createOption": "FromImage",
               "caching": "[variables('diskCaching')]",
               "vhd": {
-                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk2',copyIndex()),'.vhd')]"
+                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), parameters('apiVersions').storage.storageAccounts).primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk2',copyIndex()),'.vhd')]"
               }
             },
             {
@@ -591,7 +567,7 @@
               "createOption": "FromImage",
               "caching": "[variables('diskCaching')]",
               "vhd": {
-                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk3',copyIndex()),'.vhd')]"
+                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), parameters('apiVersions').storage.storageAccounts).primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk3',copyIndex()),'.vhd')]"
               }
             },
             {
@@ -600,7 +576,7 @@
               "createOption": "FromImage",
               "caching": "[variables('diskCaching')]",
               "vhd": {
-                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk4',copyIndex()),'.vhd')]"
+                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), parameters('apiVersions').storage.storageAccounts).primaryEndpoints.blob,variables('vhdsContainer'),'/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],concat(parameters('dmSystemPrefix'),'-dataDisk4',copyIndex()),'.vhd')]"
               }
             }
           ]
@@ -670,7 +646,7 @@
           "osDisk": {
             "name": "osdisk",
             "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(1),variables('dataStoreStorageAccountCount'))]), '2016-05-01').primaryEndpoints.blob,'vhds/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],parameters('dmSystemPrefix'),copyIndex(1),'-osdisk.vhd')]"
+              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), parameters('apiVersions').storage.storageAccounts).primaryEndpoints.blob,'vhds/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],parameters('dmSystemPrefix'),copyIndex(),'-osdisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
