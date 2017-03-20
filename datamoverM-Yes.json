@@ -244,14 +244,11 @@
     ],
     "diskCaching": "None",
     "datadiskSize": 256,
-    "publicIPAddressName": "[concat(parameters('dmSystemPrefix'),'-','publicip')]",
-    "publicIPAddressDomainNameLabel": "[concat(parameters('dmSystemPrefix'),'-',uniqueString(resourceGroup().id))]",
     "dataStoreStorageAccountCount": "[add(div(parameters('dmSystemCount'),4),1)]",
     "diagnosticsStorageAccount": "[concat('dmdiag',uniqueString(resourceGroup().id,'d'))]",
     "s1": "[split(parameters('dmSubnetStartAddress'),'.')]",
     "scriptHostUrltz": "[concat(parameters('scriptUrlInit'),'tdc-timezone.py')]",
     "scriptHostUrleco": "[concat(parameters('scriptUrlInit'),'eco_ansi.sh')]",
-    "publicIPAddressType": "Static",
     "nsgName": "dm-nsg"
   },
   "resources": [
@@ -266,22 +263,6 @@
       "properties": {
         "platformFaultDomainCount": "[variables('clusterAvailabilitySetSettings').faultDomainCount]",
         "platformUpdateDomainCount": "[variables('clusterAvailabilitySetSettings').updateDomainCount]"
-      }
-    },
-    {
-      "apiVersion": "[parameters('apiVersions').network.publicIPAddresses]",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIPAddressName')]",
-      "location": "[parameters('location')]",
-      "tags": {
-        "provider": "[toUpper(parameters('teradataTags').provider)]"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
-        "dnsSettings": {
-          "domainNameLabel": "[variables('publicIPAddressDomainNameLabel')]"
-        },
-        "idleTimeoutInMinutes": 30
       }
     },
     {
@@ -482,7 +463,6 @@
         "provider": "[toUpper(parameters('teradataTags').provider)]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgname'))]"
       ],
       "copy": {
@@ -499,9 +479,6 @@
             "properties": {
               "privateIPAllocationMethod": "Static",
               "privateIPAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),copyIndex()),256)), '.', mod(add(int(variables('s1')[3]),copyIndex()),256))]",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              },
               "subnet": {
                 "id": "[parameters('subnet1DMID')]"
               }

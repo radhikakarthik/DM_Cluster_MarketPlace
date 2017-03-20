@@ -244,8 +244,6 @@
     ],
     "datadiskSize": 256,
     "diskCaching": "None",
-    "publicIPAddressName": "[concat(parameters('dmSystemPrefix'),'-','publicip')]",
-    "publicIPAddressDomainNameLabel": "[concat(parameters('dmSystemPrefix'),'-',uniqueString(resourceGroup().id))]",
     "dataStoreStorageAccountCount": "[add(div(parameters('dmSystemCount'),4),1)]",
     "diagnosticsStorageAccount": "[concat('dmdiag',uniqueString(resourceGroup().id,'d'))]",
     "s1": "[split(parameters('dmSubnetStartAddress'),'.')]",
@@ -646,7 +644,7 @@
           "osDisk": {
             "name": "osdisk",
             "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))]), parameters('apiVersions').storage.storageAccounts).primaryEndpoints.blob,'vhds/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],parameters('dmSystemPrefix'),copyIndex(),'-osdisk.vhd')]"
+              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/','os',variables('dataStoreStorageAccountArray')[mod(copyIndex(1),variables('dataStoreStorageAccountCount'))]), parameters('apiVersions').storage.storageAccounts).primaryEndpoints.blob,'vhds/',variables('dataStoreStorageAccountArray')[mod(copyIndex(),variables('dataStoreStorageAccountCount'))],parameters('dmSystemPrefix'),copyIndex(1),'-osdisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
