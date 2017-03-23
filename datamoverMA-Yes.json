@@ -726,7 +726,7 @@
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('sudo python2.6 tdc-timezone.py,' parameters('tdcTimeZone') )]"
+          "commandToExecute": "[concat('sudo python2.6 tdc-timezone.py,' parameters('tdcTimeZone'),')]"
         }
       }
     }
