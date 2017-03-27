@@ -622,7 +622,7 @@
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('sudo python2.6 tdc-timezone.py ',parameters('tdcTimeZone'),' && sh eco_ansi.sh ',parameters('tdcTimeZone'),' \"',parameters('generateHostFileParam'),'\"',' \"',parameters('ansibleparam'),'\"',' ',parameters('dmPassword'))]"
+          "commandToExecute": "[concat('sudo python2.6 tdc-timezone.py ',parameters('tdcTimeZone'),' && sh eco_ansi.sh ',parameters('tdcTimeZone'),' \"',parameters('generateHostFileParam'),'\"',' \"',parameters('ansibleparam'),'\"')]"
         }
       }
     }
